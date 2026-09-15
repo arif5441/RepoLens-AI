@@ -1,0 +1,11 @@
+# Planned dependencies (Phase 0+). Not yet installed/pinned to exact versions.
+# Populate with pinned versions as each phase actually adds the dependency.
+
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+langchain
+sentence-transformers
+mysql-connector-python
+python-dotenv
