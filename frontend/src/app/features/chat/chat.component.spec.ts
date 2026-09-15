@@ -83,10 +83,55 @@ describe('ChatComponent', () => {
     fixture.detectChanges();
     flushRepositories([]);
 
-    const turn = { question: 'q', response: null, error: null, expandedCitation: null as number | null };
+    const turn = {
+      question: 'q',
+      response: null,
+      error: null,
+      expandedCitation: null as number | null,
+      collapsed: false,
+    };
     fixture.componentInstance.toggleCitation(turn, 0);
     expect(turn.expandedCitation).toBe(0);
     fixture.componentInstance.toggleCitation(turn, 0);
     expect(turn.expandedCitation).toBeNull();
+  });
+
+  it('collapses earlier turns when a new question is asked', async () => {
+    await setup();
+    const fixture = TestBed.createComponent(ChatComponent);
+    fixture.detectChanges();
+    flushRepositories([{ repository: 'octocat/demo', chunk_count: 1, last_indexed_at: '2026-01-01' }]);
+
+    fixture.componentInstance.question = 'first question';
+    fixture.componentInstance.ask();
+    httpMock.expectOne(`${environment.apiBaseUrl}/api/v1/repositories/ask`).flush({
+      repository: 'octocat/demo', question: 'first question', answer: 'answer one',
+      citations: [], grounded: true, model: 'phi3:mini', duration_ms: 100,
+    });
+
+    fixture.componentInstance.question = 'second question';
+    fixture.componentInstance.ask();
+    httpMock.expectOne(`${environment.apiBaseUrl}/api/v1/repositories/ask`).flush({
+      repository: 'octocat/demo', question: 'second question', answer: 'answer two',
+      citations: [], grounded: true, model: 'phi3:mini', duration_ms: 100,
+    });
+
+    expect(fixture.componentInstance.turns[0].question).toBe('second question');
+    expect(fixture.componentInstance.turns[0].collapsed).toBeFalse();
+    expect(fixture.componentInstance.turns[1].question).toBe('first question');
+    expect(fixture.componentInstance.turns[1].collapsed).toBeTrue();
+  });
+
+  it('selectTurn expands the chosen turn', async () => {
+    await setup();
+    const fixture = TestBed.createComponent(ChatComponent);
+    fixture.detectChanges();
+    flushRepositories([{ repository: 'octocat/demo', chunk_count: 1, last_indexed_at: '2026-01-01' }]);
+
+    fixture.componentInstance.turns = [
+      { question: 'q1', response: null, error: null, expandedCitation: null, collapsed: true },
+    ];
+    fixture.componentInstance.selectTurn(0);
+    expect(fixture.componentInstance.turns[0].collapsed).toBeFalse();
   });
 });

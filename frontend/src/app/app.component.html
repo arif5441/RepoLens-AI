@@ -1,56 +1,112 @@
-<div class="flex min-h-screen flex-col bg-slate-50">
-  <header class="border-b border-slate-200 bg-white px-6 py-3">
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <span class="text-base font-semibold tracking-tight text-slate-800">RepoLens AI</span>
-        <span class="rounded bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500">
-          Codebase Intelligence
-        </span>
+<div class="flex h-screen overflow-hidden bg-slate-50">
+  <!-- Sidebar -->
+  <aside class="flex w-60 flex-shrink-0 flex-col overflow-y-auto bg-slate-900 text-slate-300">
+    <div class="flex items-center gap-2 px-5 py-5">
+      <span
+        class="flex h-8 w-8 items-center justify-center rounded bg-blue-600 text-sm font-bold text-white"
+        >R</span
+      >
+      <div class="leading-tight">
+        <div class="text-sm font-semibold text-white">RepoLens AI</div>
+        <div class="text-[11px] text-slate-400">Codebase Intelligence</div>
       </div>
-      <nav class="flex flex-wrap gap-4 text-sm">
-        <a
-          routerLink="/"
-          routerLinkActive="text-slate-900 font-semibold"
-          [routerLinkActiveOptions]="{ exact: true }"
-          class="text-slate-500 hover:text-slate-800"
-          >Dashboard</a
-        >
-        <a
-          routerLink="/repositories"
-          routerLinkActive="text-slate-900 font-semibold"
-          class="text-slate-500 hover:text-slate-800"
-          >Repositories</a
-        >
-        <a
-          routerLink="/chat"
-          routerLinkActive="text-slate-900 font-semibold"
-          class="text-slate-500 hover:text-slate-800"
-          >Chat</a
-        >
-        <span class="text-slate-300">|</span>
-        <a
-          routerLink="/playground"
-          routerLinkActive="text-slate-900 font-semibold"
-          class="text-slate-500 hover:text-slate-800"
-          >LLM Playground</a
-        >
-        <a
-          routerLink="/embeddings"
-          routerLinkActive="text-slate-900 font-semibold"
-          class="text-slate-500 hover:text-slate-800"
-          >Embeddings</a
-        >
-        <a
-          routerLink="/ingest"
-          routerLinkActive="text-slate-900 font-semibold"
-          class="text-slate-500 hover:text-slate-800"
-          >Ingest (diagnostic)</a
-        >
-      </nav>
     </div>
-  </header>
 
-  <main class="flex-1">
-    <router-outlet />
-  </main>
+    <nav class="flex-1 space-y-0.5 px-3 py-2">
+      <a
+        routerLink="/"
+        routerLinkActive="bg-slate-800 text-white"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="flex items-center gap-3 rounded px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white"
+      >
+        <svg class="h-4.5 w-4.5" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+          <path d="M3 11.5 12 4l9 7.5" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        Home
+      </a>
+      <a
+        routerLink="/repositories"
+        routerLinkActive="bg-slate-800 text-white"
+        class="flex items-center gap-3 rounded px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+          <path d="M4 5.5A1.5 1.5 0 0 1 5.5 4h4l2 2.5h8A1.5 1.5 0 0 1 21 8v10.5A1.5 1.5 0 0 1 19.5 20h-15A1.5 1.5 0 0 1 3 18.5v-13Z" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        Repositories
+      </a>
+      <a
+        routerLink="/chat"
+        routerLinkActive="bg-slate-800 text-white"
+        class="flex items-center gap-3 rounded px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+          <path d="M4 5h16a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H9l-4 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        Chat
+      </a>
+
+      <div class="mt-5 mb-1 px-3 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+        Diagnostics
+      </div>
+
+      <a
+        routerLink="/playground"
+        routerLinkActive="bg-slate-800 text-white"
+        class="flex items-center gap-3 rounded px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+          <path d="M9 3h6M10 3v5.5L5.5 17a1.8 1.8 0 0 0 1.6 2.6h9.8a1.8 1.8 0 0 0 1.6-2.6L14 8.5V3" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        LLM Playground
+      </a>
+      <a
+        routerLink="/embeddings"
+        routerLinkActive="bg-slate-800 text-white"
+        class="flex items-center gap-3 rounded px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+          <circle cx="6" cy="6" r="2.2" /><circle cx="18" cy="6" r="2.2" /><circle cx="12" cy="18" r="2.2" />
+          <path d="M7.8 7.2 10.5 16M16.2 7.2 13.5 16" stroke-linecap="round" />
+        </svg>
+        Embeddings
+      </a>
+      <a
+        routerLink="/ingest"
+        routerLinkActive="bg-slate-800 text-white"
+        class="flex items-center gap-3 rounded px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+          <path d="M12 4v11M8 11l4 4 4-4M4 19.5h16" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        Ingest (diagnostic)
+      </a>
+    </nav>
+
+    <div class="m-3 rounded border border-slate-700 bg-slate-800/60 px-3 py-3">
+      <div class="text-xs font-semibold text-white">Local AI. Full Control.</div>
+      <div class="mt-0.5 text-[11px] text-slate-400">Your code. Your data. Your machine.</div>
+      <div class="mt-2 flex items-center gap-1.5">
+        <span class="inline-block h-1.5 w-1.5 rounded-full" [ngClass]="systemStatusDotClass"></span>
+        <span class="text-[11px] text-slate-400">{{ systemStatusLabel }}</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="flex h-screen flex-1 flex-col overflow-hidden">
+    <header
+      class="flex flex-shrink-0 items-center justify-between border-b border-slate-200 bg-white px-6 py-3"
+    >
+      <h1 class="text-base font-semibold text-slate-800">{{ pageTitle }}</h1>
+      <div class="flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1 text-xs">
+        <span class="inline-block h-2 w-2 rounded-full" [ngClass]="systemStatusDotClass"></span>
+        <span class="text-slate-600">{{ systemStatusLabel }}</span>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto">
+      <router-outlet />
+    </main>
+  </div>
 </div>

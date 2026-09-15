@@ -11,6 +11,7 @@ interface ConversationTurn {
   response: AskResponse | null;
   error: string | null;
   expandedCitation: number | null;
+  collapsed: boolean;
 }
 
 @Component({
@@ -71,13 +72,35 @@ export class ChatComponent implements OnInit {
     turn.expandedCitation = turn.expandedCitation === index ? null : index;
   }
 
+  toggleTurn(turn: ConversationTurn): void {
+    turn.collapsed = !turn.collapsed;
+  }
+
+  selectTurn(index: number): void {
+    const turn = this.turns[index];
+    if (!turn) {
+      return;
+    }
+    turn.collapsed = false;
+    setTimeout(() => {
+      document.getElementById(`turn-${index}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
   ask(): void {
     if (!this.canAsk) {
       return;
     }
 
     const question = this.question.trim();
-    const turn: ConversationTurn = { question, response: null, error: null, expandedCitation: null };
+    this.turns.forEach((t) => (t.collapsed = true));
+    const turn: ConversationTurn = {
+      question,
+      response: null,
+      error: null,
+      expandedCitation: null,
+      collapsed: false,
+    };
     this.turns = [turn, ...this.turns];
     this.question = '';
     this.asking = true;
@@ -92,5 +115,17 @@ export class ChatComponent implements OnInit {
         this.asking = false;
       },
     });
+  }
+
+  turnStatusDotClass(turn: ConversationTurn): string {
+    if (turn.error) return 'bg-red-500';
+    if (!turn.response) return 'bg-slate-300';
+    return turn.response.grounded ? 'bg-emerald-500' : 'bg-amber-500';
+  }
+
+  turnStatusLabel(turn: ConversationTurn): string {
+    if (turn.error) return 'Error';
+    if (!turn.response) return 'Thinking…';
+    return turn.response.grounded ? 'Grounded' : 'No evidence';
   }
 }
