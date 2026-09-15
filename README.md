@@ -66,3 +66,4 @@ RepoLens runs entirely on local, free/open-source models by default: Ollama for 
 ## License
 
 See [LICENSE](LICENSE).
+# RepoLens-AI
