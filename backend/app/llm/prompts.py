@@ -6,8 +6,8 @@ SYSTEM_PROMPT = (
 )
 
 
-def build_chat_messages(user_message: str) -> list[ChatMessage]:
+def build_chat_messages(user_message: str, system_prompt: str | None = None) -> list[ChatMessage]:
     return [
-        ChatMessage(role="system", content=SYSTEM_PROMPT),
+        ChatMessage(role="system", content=system_prompt or SYSTEM_PROMPT),
         ChatMessage(role="user", content=user_message),
     ]

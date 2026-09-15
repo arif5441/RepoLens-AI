@@ -17,9 +17,10 @@ class _StubProvider:
         return True, None
 
     def list_models(self):
-        return []
+        return ["phi3:mini", "llama3.2:3b"]
 
     def chat(self, messages, model, temperature):
+        self.last_model = model
         if self._error:
             raise self._error
         return self._result
@@ -61,3 +62,25 @@ def test_chat_endpoint_returns_503_when_ollama_unavailable():
     assert response.status_code == 503
     body = response.json()
     assert body["error"]["code"] == "LLMUnavailableError"
+
+
+def test_chat_endpoint_forwards_system_prompt_and_model():
+    provider = _StubProvider(result=ChatResult(content="ok", model="llama3.2:3b", duration_ms=1.0))
+    _override(provider)
+
+    response = client.post(
+        "/api/v1/llm/chat",
+        json={"message": "hello", "system_prompt": "You are a pirate.", "model": "llama3.2:3b"},
+    )
+
+    assert response.status_code == 200
+    assert provider.last_model == "llama3.2:3b"
+
+
+def test_models_endpoint_returns_provider_models():
+    _override(_StubProvider())
+
+    response = client.get("/api/v1/llm/models")
+
+    assert response.status_code == 200
+    assert response.json()["models"] == ["phi3:mini", "llama3.2:3b"]

@@ -4,23 +4,30 @@ from app.core.config import Settings
 from app.llm.base import LLMProvider
 from app.llm.exceptions import LLMProviderError
 from app.llm.prompts import build_chat_messages
-from app.schemas.llm import LLMChatResponse
+from app.schemas.llm import LLMChatResponse, LLMModelsResponse
 
 logger = logging.getLogger(__name__)
 
 PROVIDER_NAME = "ollama"
 
 
-def chat(provider: LLMProvider, settings: Settings, message: str) -> LLMChatResponse:
-    messages = build_chat_messages(message)
+def chat(
+    provider: LLMProvider,
+    settings: Settings,
+    message: str,
+    system_prompt: str | None = None,
+    model: str | None = None,
+) -> LLMChatResponse:
+    messages = build_chat_messages(message, system_prompt)
+    resolved_model = model or settings.ollama_model
 
     try:
-        result = provider.chat(messages, model=settings.ollama_model, temperature=settings.llm_temperature)
+        result = provider.chat(messages, model=resolved_model, temperature=settings.llm_temperature)
     except LLMProviderError:
         logger.warning(
             "LLM chat failed | provider=%s model=%s message_length=%d",
             PROVIDER_NAME,
-            settings.ollama_model,
+            resolved_model,
             len(message),
         )
         raise
@@ -39,3 +46,7 @@ def chat(provider: LLMProvider, settings: Settings, message: str) -> LLMChatResp
         provider=PROVIDER_NAME,
         duration_ms=result.duration_ms,
     )
+
+
+def list_models(provider: LLMProvider) -> LLMModelsResponse:
+    return LLMModelsResponse(models=provider.list_models())

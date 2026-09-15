@@ -2,6 +2,19 @@
 
 Codebase intelligence and explainable RAG system. Index a public GitHub repository, ask questions about its source code, get answers grounded in retrieved code with file/line-level citations.
 
+![RepoLens AI overview](docs/images/overview.png)
+
+## How It Works
+
+1. **Ingest** — paste a public GitHub URL at `/repositories`. RepoLens pulls the file tree via the GitHub API (no clone), filters out binaries/lockfiles/generated files.
+2. **Chunk + Embed** — included files are split into function/class-level chunks, each turned into a vector by a local embedding model, and stored in MySQL.
+3. **Ask** — at `/chat`, pick the indexed repo and ask a question in plain English.
+4. **Retrieve + Rank** — your question is embedded too; RepoLens finds the most similar stored chunks by cosine similarity.
+5. **Answer, grounded** — the top chunks are handed to a local LLM (Ollama) as context, with instructions to answer only from that evidence and cite it. If nothing relevant was found, it says so instead of guessing.
+6. **Citations** — every answer links back to the exact file, line range, and real source snippet it came from — expand any citation to see it.
+
+New to the project? Full click-by-click steps: [USER_MANUAL.md](USER_MANUAL.md). Full build history and what's honestly *not* built: [FEATURE.md](FEATURE.md).
+
 ## Status
 
 **Working end to end — Phase 0 through Phase 11 implemented and verified** (Phase 12, public release polish, not started). RepoLens can index a real public GitHub repository and answer real questions about it, grounded in retrieved code with citations, refusing to guess when it doesn't have evidence. Some sub-capabilities are honestly incomplete — see [FEATURE.md](FEATURE.md) for exactly what is and isn't built (each phase lists concrete cuts, not just checkmarks).
@@ -86,12 +99,14 @@ Backend: http://localhost:8000/health · Frontend: http://localhost:4200
 
 | Page | What it does |
 |---|---|
-| `/` | System status dashboard |
-| `/repositories` | Index a GitHub repo, see what's indexed |
-| `/chat` | Ask questions about an indexed repo, grounded answers with citations |
-| `/playground` | Diagnostic: raw LLM chat, no repository context |
-| `/embeddings` | Diagnostic: embedding generation + similarity, in-memory only |
-| `/ingest` | Diagnostic: file discovery/filtering only, doesn't store anything |
+| `/` | Dashboard — system status, recent repositories, quick actions |
+| `/repositories` | **Main flow.** Index a GitHub repo, see what's indexed |
+| `/chat` | **Main flow.** Ask questions about an indexed repo, grounded answers with citations |
+| `/playground` | Diagnostic — raw LLM chat, no repository context. Debug: is Ollama/the model working at all? |
+| `/embeddings` | Diagnostic — embedding + similarity only, nothing stored. Debug: does the similarity model behave sanely? |
+| `/ingest` | Diagnostic — file discovery/filtering only, nothing stored. Debug: would this repo ingest cleanly before committing to a full index? |
+
+Normal use only needs `/repositories` + `/chat`. The three diagnostic pages exist to test one pipeline stage in isolation when something upstream breaks — they don't save anything to the database.
 
 **A note on speed**: this runs entirely on local CPU inference by default. A short LLM reply takes ~15s; a full grounded RAG answer with retrieved code context takes **~100-115s** on a CPU-only machine (no GPU). This is real, measured, and expected — the chat UI says so explicitly rather than hiding a long wait behind an unexplained spinner. Faster with a GPU-backed Ollama setup or a smaller/faster model.
 

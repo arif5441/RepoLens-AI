@@ -1,18 +1,47 @@
 <section class="mx-auto max-w-3xl px-6 py-8">
   <ui5-title level="H4" class="mb-1 block">LLM Playground</ui5-title>
   <p class="mb-6 text-sm text-slate-500">
-    Send a message directly to the local LLM through Ollama. No repository context yet — that comes with
-    retrieval in a later phase.
+    Send a message directly to the local LLM through Ollama. No repository context — that's what
+    `/chat` is for.
   </p>
 
   <div class="flex flex-col gap-3">
-    <ui5-textarea
-      placeholder="Ask something, e.g. &quot;Explain dependency injection in simple terms.&quot;"
-      rows="4"
-      [value]="message"
-      (input)="onInput($event)"
-      [disabled]="loading"
-    ></ui5-textarea>
+    <div>
+      <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-400">Model</label>
+      <select
+        class="w-full rounded border border-slate-300 px-3 py-2 text-sm text-slate-700"
+        [value]="selectedModel"
+        (change)="onModelChange($event)"
+        [disabled]="loading"
+      >
+        <option value="">Default (server-configured)</option>
+        @for (model of models; track model) {
+          <option [value]="model">{{ model }}</option>
+        }
+      </select>
+    </div>
+
+    <div>
+      <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-400">System Prompt</label>
+      <ui5-textarea
+        placeholder="Optional — overrides the default assistant persona, e.g. &quot;You are a senior Python reviewer.&quot;"
+        rows="2"
+        [value]="systemPrompt"
+        (input)="onSystemPromptChange($event)"
+        [disabled]="loading"
+      ></ui5-textarea>
+    </div>
+
+    <div>
+      <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-400">User Prompt</label>
+      <ui5-textarea
+        placeholder="Ask something, e.g. &quot;Explain dependency injection in simple terms.&quot;"
+        rows="4"
+        [value]="message"
+        (input)="onMessageChange($event)"
+        [disabled]="loading"
+      ></ui5-textarea>
+    </div>
 
     <div class="flex items-center justify-between">
       <ui5-button design="Emphasized" [disabled]="!canSend" (click)="send()">
@@ -33,7 +62,7 @@
           <span>Provider: <span class="font-medium text-slate-700">{{ result.provider }}</span></span>
           <span>Model: <span class="font-medium text-slate-700">{{ result.model }}</span></span>
           <span>Status: <span class="font-medium text-emerald-600">Success</span></span>
-          <span>Duration: <span class="font-medium text-slate-700">{{ result.duration_ms | number: '1.0-0' }} ms</span></span>
+          <span>Duration: <span class="font-medium text-slate-700">{{ (result.duration_ms / 1000) | number: '1.1-1' }}s</span></span>
         </div>
         <p class="whitespace-pre-wrap text-sm text-slate-800">{{ result.response }}</p>
       </div>

@@ -20,15 +20,30 @@ describe('LlmPlaygroundComponent', () => {
     fixture.componentInstance.message = value;
   }
 
+  function flushModels(models: string[] = ['phi3:mini', 'llama3.2:3b']) {
+    httpMock.expectOne(`${environment.apiBaseUrl}/api/v1/llm/models`).flush({ models });
+  }
+
+  it('loads the available models on init', () => {
+    const fixture = TestBed.createComponent(LlmPlaygroundComponent);
+    fixture.detectChanges();
+    flushModels();
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.models).toEqual(['phi3:mini', 'llama3.2:3b']);
+  });
+
   it('disables send when the message is empty', () => {
     const fixture = TestBed.createComponent(LlmPlaygroundComponent);
     fixture.detectChanges();
+    flushModels();
     expect(fixture.componentInstance.canSend).toBeFalse();
   });
 
   it('enables send once a non-empty message is entered', () => {
     const fixture = TestBed.createComponent(LlmPlaygroundComponent);
     fixture.detectChanges();
+    flushModels();
     setMessage(fixture, 'Explain DI');
     expect(fixture.componentInstance.canSend).toBeTrue();
   });
@@ -36,6 +51,7 @@ describe('LlmPlaygroundComponent', () => {
   it('shows a loading state and disables send while the request is in flight', () => {
     const fixture = TestBed.createComponent(LlmPlaygroundComponent);
     fixture.detectChanges();
+    flushModels();
     setMessage(fixture, 'Explain DI');
 
     fixture.componentInstance.send();
@@ -55,6 +71,7 @@ describe('LlmPlaygroundComponent', () => {
   it('renders the response on success', () => {
     const fixture = TestBed.createComponent(LlmPlaygroundComponent);
     fixture.detectChanges();
+    flushModels();
     setMessage(fixture, 'Explain DI');
     fixture.componentInstance.send();
 
@@ -74,6 +91,7 @@ describe('LlmPlaygroundComponent', () => {
   it('shows an error message when the request fails', () => {
     const fixture = TestBed.createComponent(LlmPlaygroundComponent);
     fixture.detectChanges();
+    flushModels();
     setMessage(fixture, 'Explain DI');
     fixture.componentInstance.send();
 
@@ -86,5 +104,23 @@ describe('LlmPlaygroundComponent', () => {
     expect(fixture.componentInstance.errorMessage).toBe('could not connect to ollama');
     expect(fixture.componentInstance.loading).toBeFalse();
     expect(fixture.componentInstance.result).toBeNull();
+  });
+
+  it('sends the chosen system prompt and model override in the request', () => {
+    const fixture = TestBed.createComponent(LlmPlaygroundComponent);
+    fixture.detectChanges();
+    flushModels();
+    setMessage(fixture, 'Explain DI');
+    fixture.componentInstance.systemPrompt = 'You are a pirate.';
+    fixture.componentInstance.selectedModel = 'llama3.2:3b';
+    fixture.componentInstance.send();
+
+    const req = httpMock.expectOne(`${environment.apiBaseUrl}/api/v1/llm/chat`);
+    expect(req.request.body).toEqual({
+      message: 'Explain DI',
+      system_prompt: 'You are a pirate.',
+      model: 'llama3.2:3b',
+    });
+    req.flush({ response: 'ok', model: 'llama3.2:3b', provider: 'ollama', duration_ms: 5 });
   });
 });
