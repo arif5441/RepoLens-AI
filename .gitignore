@@ -47,6 +47,7 @@ build/
 data/
 *.db
 *.sqlite3
+evaluation/results/
 
 # --- Local model / cache files ---
 models/

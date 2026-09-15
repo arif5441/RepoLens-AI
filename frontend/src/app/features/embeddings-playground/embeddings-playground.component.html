@@ -1,0 +1,77 @@
+<section class="mx-auto max-w-3xl px-6 py-8">
+  <ui5-title level="H4" class="mb-1 block">Embeddings Playground</ui5-title>
+  <p class="mb-6 text-sm text-slate-500">
+    Enter a few texts and see how the local embedding model scores their semantic similarity. Two
+    related texts should score higher than an unrelated one.
+  </p>
+
+  <div class="flex flex-col gap-2">
+    @for (text of texts; track $index) {
+      <div class="flex items-center gap-2">
+        <ui5-input
+          class="flex-1"
+          placeholder="Text {{ $index + 1 }}"
+          [value]="text"
+          (input)="onTextChange($index, $event)"
+          [disabled]="loading"
+        ></ui5-input>
+        @if (texts.length > 2) {
+          <ui5-button design="Transparent" icon="delete" (click)="removeText($index)" [disabled]="loading"></ui5-button>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="mt-3 flex items-center justify-between">
+    <ui5-button design="Transparent" [disabled]="texts.length >= 8 || loading" (click)="addText()">
+      + Add text
+    </ui5-button>
+
+    <div class="flex items-center gap-3">
+      @if (loading) {
+        <ui5-busy-indicator active size="S"></ui5-busy-indicator>
+      }
+      <ui5-button design="Emphasized" [disabled]="!canSend" (click)="send()">
+        {{ loading ? 'Generating…' : 'Generate embeddings' }}
+      </ui5-button>
+    </div>
+  </div>
+
+  <div class="mt-6">
+    @if (errorMessage) {
+      <ui5-message-strip design="Negative" [hideCloseButton]="true">{{ errorMessage }}</ui5-message-strip>
+    } @else if (result) {
+      <div class="rounded border border-slate-200 bg-white px-4 py-4">
+        <div class="mb-4 flex flex-wrap gap-4 text-xs text-slate-500">
+          <span>Model: <span class="font-medium text-slate-700">{{ result.model }}</span></span>
+          <span>Dimension: <span class="font-medium text-slate-700">{{ result.dimension }}</span></span>
+          <span>Inputs: <span class="font-medium text-slate-700">{{ result.count }}</span></span>
+          <span>Duration: <span class="font-medium text-slate-700">{{ result.duration_ms | number: '1.0-0' }} ms</span></span>
+        </div>
+
+        <table class="w-full text-left text-sm">
+          <thead>
+            <tr class="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-400">
+              <th class="pb-2 pr-4 font-medium">Text A</th>
+              <th class="pb-2 pr-4 font-medium">Text B</th>
+              <th class="pb-2 font-medium">Similarity</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (pair of sortedSimilarities; track pair.text_a_index + '-' + pair.text_b_index) {
+              <tr class="border-b border-slate-100 last:border-0">
+                <td class="py-2 pr-4 text-slate-700">{{ pair.text_a }}</td>
+                <td class="py-2 pr-4 text-slate-700">{{ pair.text_b }}</td>
+                <td class="py-2 font-medium text-slate-800">{{ pair.similarity | number: '1.2-2' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else if (!loading) {
+      <div class="rounded border border-dashed border-slate-200 px-4 py-6 text-center text-sm text-slate-400">
+        Enter at least two texts and generate embeddings to compare them.
+      </div>
+    }
+  </div>
+</section>

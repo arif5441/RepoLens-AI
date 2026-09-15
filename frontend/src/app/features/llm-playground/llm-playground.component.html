@@ -1,0 +1,46 @@
+<section class="mx-auto max-w-3xl px-6 py-8">
+  <ui5-title level="H4" class="mb-1 block">LLM Playground</ui5-title>
+  <p class="mb-6 text-sm text-slate-500">
+    Send a message directly to the local LLM through Ollama. No repository context yet — that comes with
+    retrieval in a later phase.
+  </p>
+
+  <div class="flex flex-col gap-3">
+    <ui5-textarea
+      placeholder="Ask something, e.g. &quot;Explain dependency injection in simple terms.&quot;"
+      rows="4"
+      [value]="message"
+      (input)="onInput($event)"
+      [disabled]="loading"
+    ></ui5-textarea>
+
+    <div class="flex items-center justify-between">
+      <ui5-button design="Emphasized" [disabled]="!canSend" (click)="send()">
+        {{ loading ? 'Sending…' : 'Send' }}
+      </ui5-button>
+      @if (loading) {
+        <ui5-busy-indicator active size="S"></ui5-busy-indicator>
+      }
+    </div>
+  </div>
+
+  <div class="mt-6">
+    @if (errorMessage) {
+      <ui5-message-strip design="Negative" [hideCloseButton]="true">{{ errorMessage }}</ui5-message-strip>
+    } @else if (result) {
+      <div class="rounded border border-slate-200 bg-white px-4 py-4">
+        <div class="mb-3 flex flex-wrap gap-4 text-xs text-slate-500">
+          <span>Provider: <span class="font-medium text-slate-700">{{ result.provider }}</span></span>
+          <span>Model: <span class="font-medium text-slate-700">{{ result.model }}</span></span>
+          <span>Status: <span class="font-medium text-emerald-600">Success</span></span>
+          <span>Duration: <span class="font-medium text-slate-700">{{ result.duration_ms | number: '1.0-0' }} ms</span></span>
+        </div>
+        <p class="whitespace-pre-wrap text-sm text-slate-800">{{ result.response }}</p>
+      </div>
+    } @else if (!loading) {
+      <div class="rounded border border-dashed border-slate-200 px-4 py-6 text-center text-sm text-slate-400">
+        No response yet. Ask something above.
+      </div>
+    }
+  </div>
+</section>

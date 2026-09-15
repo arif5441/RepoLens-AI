@@ -1,0 +1,99 @@
+<section class="mx-auto max-w-4xl px-6 py-8">
+  <ui5-title level="H4" class="mb-1 block">Repository Ingestion</ui5-title>
+  <p class="mb-6 text-sm text-slate-500">
+    Discover and filter a public GitHub repository's source files. Read-only — no clone, no code
+    execution. This is diagnostic: output isn't stored or chunked yet.
+  </p>
+
+  <div class="flex items-center gap-2">
+    <ui5-input
+      class="flex-1"
+      placeholder="https://github.com/owner/repository"
+      [value]="url"
+      (input)="onUrlChange($event)"
+      [disabled]="loading"
+    ></ui5-input>
+    <ui5-button design="Emphasized" [disabled]="!canIngest" (click)="ingest()">
+      {{ loading ? 'Ingesting…' : 'Ingest' }}
+    </ui5-button>
+    @if (loading) {
+      <ui5-busy-indicator active size="S"></ui5-busy-indicator>
+    }
+  </div>
+
+  <div class="mt-6">
+    @if (errorMessage) {
+      <ui5-message-strip design="Negative" [hideCloseButton]="true">{{ errorMessage }}</ui5-message-strip>
+    } @else if (result) {
+      <div class="flex flex-col gap-4">
+        @if (result.truncated) {
+          <ui5-message-strip design="Warning" [hideCloseButton]="true">
+            GitHub truncated the file tree for this repository — not every file may have been
+            discovered.
+          </ui5-message-strip>
+        }
+
+        <div class="rounded border border-slate-200 bg-white px-4 py-4">
+          <div class="mb-1 text-sm font-semibold text-slate-800">
+            {{ result.repository }} <span class="font-normal text-slate-400">&#64; {{ result.branch }}</span>
+          </div>
+          <div class="flex flex-wrap gap-4 text-xs text-slate-500">
+            <span>Discovered: <span class="font-medium text-slate-700">{{ result.files_discovered }}</span></span>
+            <span>Included: <span class="font-medium text-emerald-600">{{ result.files_included }}</span></span>
+            <span>Skipped: <span class="font-medium text-amber-600">{{ result.files_skipped }}</span></span>
+            <span>Total size: <span class="font-medium text-slate-700">{{ result.total_size_bytes | number }} bytes</span></span>
+          </div>
+        </div>
+
+        @if (skippedReasonEntries.length > 0) {
+          <div class="rounded border border-slate-200 bg-white px-4 py-4">
+            <div class="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+              Skipped file reasons
+            </div>
+            <div class="flex flex-wrap gap-2">
+              @for (entry of skippedReasonEntries; track entry.reason) {
+                <span class="rounded bg-slate-100 px-2 py-1 text-xs text-slate-600">
+                  {{ entry.reason }}: <span class="font-medium">{{ entry.count }}</span>
+                </span>
+              }
+            </div>
+          </div>
+        }
+
+        @if (result.files.length > 0) {
+          <div class="rounded border border-slate-200 bg-white px-4 py-4">
+            <div class="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+              Included files
+            </div>
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-400">
+                  <th class="pb-2 pr-4 font-medium">Path</th>
+                  <th class="pb-2 pr-4 font-medium">Language</th>
+                  <th class="pb-2 font-medium">Size</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (file of result.files; track file.path) {
+                  <tr class="border-b border-slate-100 last:border-0">
+                    <td class="py-2 pr-4 font-mono text-xs text-slate-700">{{ file.path }}</td>
+                    <td class="py-2 pr-4 text-slate-600">{{ file.language }}</td>
+                    <td class="py-2 text-slate-600">{{ file.size_bytes | number }} bytes</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else {
+          <div class="rounded border border-dashed border-slate-200 px-4 py-6 text-center text-sm text-slate-400">
+            No files matched the supported-extension filter for this repository.
+          </div>
+        }
+      </div>
+    } @else if (!loading) {
+      <div class="rounded border border-dashed border-slate-200 px-4 py-6 text-center text-sm text-slate-400">
+        Enter a public GitHub repository URL and ingest to see its source files.
+      </div>
+    }
+  </div>
+</section>

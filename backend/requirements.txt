@@ -1,11 +1,17 @@
-# Planned dependencies (Phase 0+). Not yet installed/pinned to exact versions.
-# Populate with pinned versions as each phase actually adds the dependency.
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+pydantic-settings==2.7.1
+sqlalchemy==2.0.36
+pymysql==1.1.1
+cryptography==44.0.0
+python-dotenv==1.0.1
+pytest==8.3.4
+httpx==0.28.1
 
-fastapi
-uvicorn[standard]
-pydantic
-pydantic-settings
-langchain
-sentence-transformers
-mysql-connector-python
-python-dotenv
+# Phase 2 — local embeddings. Pulls torch (CPU build) + transformers as dependencies.
+sentence-transformers==6.0.1
+
+# Phase 3 — MySQL migrations.
+alembic==1.20.0
+Mako==1.4.1

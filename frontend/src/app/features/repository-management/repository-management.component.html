@@ -1,0 +1,80 @@
+<section class="mx-auto max-w-4xl px-6 py-8">
+  <ui5-title level="H4" class="mb-1 block">Repository Management</ui5-title>
+  <p class="mb-6 text-sm text-slate-500">
+    Index a public GitHub repository — ingest, chunk, embed, and store it — then ask questions
+    about it in the chat.
+  </p>
+
+  <div class="flex items-center gap-2">
+    <ui5-input
+      class="flex-1"
+      placeholder="https://github.com/owner/repository"
+      [value]="url"
+      (input)="onUrlChange($event)"
+      [disabled]="indexing"
+    ></ui5-input>
+    <ui5-button design="Emphasized" [disabled]="!canIndex" (click)="indexRepository()">
+      {{ indexing ? 'Indexing…' : 'Index' }}
+    </ui5-button>
+    @if (indexing) {
+      <ui5-busy-indicator active size="S"></ui5-busy-indicator>
+    }
+  </div>
+  @if (indexing) {
+    <p class="mt-2 text-xs text-slate-400">
+      This can take a while for larger repositories (fetching + embedding every included file).
+    </p>
+  }
+
+  @if (indexError) {
+    <ui5-message-strip design="Negative" class="mt-4 block" [hideCloseButton]="true">
+      {{ indexError }}
+    </ui5-message-strip>
+  } @else if (indexResult) {
+    <ui5-message-strip design="Positive" class="mt-4 block" [hideCloseButton]="true">
+      Indexed {{ indexResult.repository }}&#64;{{ indexResult.branch }}: {{ indexResult.files_included }}
+      files, {{ indexResult.chunks_stored }} chunks stored.
+    </ui5-message-strip>
+  }
+
+  <div class="mt-8">
+    <div class="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+      Indexed repositories
+    </div>
+
+    @if (listLoading) {
+      <div class="rounded border border-slate-200 bg-white px-4 py-6 text-center text-sm text-slate-400">
+        Loading…
+      </div>
+    } @else if (listError) {
+      <ui5-message-strip design="Negative" [hideCloseButton]="true">{{ listError }}</ui5-message-strip>
+    } @else if (repositories.length === 0) {
+      <div class="rounded border border-dashed border-slate-200 px-4 py-6 text-center text-sm text-slate-400">
+        No repositories indexed yet.
+      </div>
+    } @else {
+      <table class="w-full text-left text-sm">
+        <thead>
+          <tr class="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-400">
+            <th class="pb-2 pr-4 font-medium">Repository</th>
+            <th class="pb-2 pr-4 font-medium">Chunks</th>
+            <th class="pb-2 pr-4 font-medium">Last indexed</th>
+            <th class="pb-2 font-medium"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (repo of repositories; track repo.repository) {
+            <tr class="border-b border-slate-100 last:border-0">
+              <td class="py-2 pr-4 font-mono text-xs text-slate-700">{{ repo.repository }}</td>
+              <td class="py-2 pr-4 text-slate-600">{{ repo.chunk_count }}</td>
+              <td class="py-2 pr-4 text-slate-500">{{ repo.last_indexed_at }}</td>
+              <td class="py-2">
+                <ui5-button design="Transparent" (click)="openChat(repo.repository)">Ask questions</ui5-button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</section>

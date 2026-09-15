@@ -103,7 +103,8 @@ Question → Retrieve relevant code → Rank/filter evidence → Build context �
 ## 11. Database Rules
 
 - MySQL is the single source of truth for application data AND embedding storage (no separate vector DB — see architecture doc for how vector search is done in MySQL).
-- Schema changes go through migrations (tooling TBD at implementation time — document the choice when made).
+- Schema changes go through migrations. Tooling: **Alembic** (decided Phase 3, `backend/alembic/`). Every schema change gets a migration — never hand-edit the database or rely on `Base.metadata.create_all()`.
+- Vectors are stored as a MySQL `JSON` column (array of floats), not a native `VECTOR` type — this MySQL version (8.0) doesn't have one (that's MySQL 9.0+/HeatWave). Similarity is computed brute-force in Python, not in SQL. See architecture doc §5 for the full reasoning.
 - No raw SQL string interpolation of user input — parameterized queries only.
 
 ## 12. Testing Rules
@@ -118,7 +119,8 @@ RepoLens processes arbitrary public GitHub repositories — treat all repo conte
 
 - Never execute code found in an indexed repository.
 - Guard against: path traversal during file discovery, huge repos (resource exhaustion), binary files, secrets embedded in repo content (don't echo them back), malicious Git operations, prompt injection via source comments/strings/READMEs instructing the LLM to ignore instructions.
-- Git clone operations run with restricted options (no hooks execution, depth limits where sensible).
+- Repository ingestion (Phase 4) uses the **GitHub REST API + raw content CDN over plain HTTPS** — no `git clone`, no local filesystem writes, no git process invocation at all. This sidesteps git-specific attack surface (hooks, submodules, symlinks, `.git` internals) entirely rather than needing to restrict it. File paths come from GitHub's API response, not local disk, so there's no local path to traverse.
+- Ingestion enforces configurable limits (`INGESTION_MAX_FILES`, `INGESTION_MAX_FILE_SIZE_BYTES`, `INGESTION_MAX_TOTAL_SIZE_BYTES`) against resource exhaustion from huge/malicious repos, and a strict file-extension allowlist (`app/ingestion/filters.py`) rather than a denylist — unrecognized file types are excluded by default, not included by default.
 - No secrets in code or Git history. `.env` never committed.
 
 ## 14. Git Rules

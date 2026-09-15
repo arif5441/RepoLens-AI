@@ -1,0 +1,57 @@
+{
+  "repository_url": "https://github.com/trekhleb/learn-python",
+  "repository": "trekhleb/learn-python",
+  "description": "Retrieval/answer evaluation cases against a small, stable, real public Python repository (github.com/trekhleb/learn-python). Expected files are known from inspecting the repo directly, not guessed.",
+  "cases": [
+    {
+      "question": "How do generators work? Show an example.",
+      "expected_file_contains": "test_generators.py",
+      "run_ask": true
+    },
+    {
+      "question": "How does exception handling work in Python?",
+      "expected_file_contains": "test_handle_exceptions.py",
+      "run_ask": true
+    },
+    {
+      "question": "How do I raise a custom exception?",
+      "expected_file_contains": "test_raise_exceptions.py",
+      "run_ask": false
+    },
+    {
+      "question": "What is multiple inheritance and how is it used?",
+      "expected_file_contains": "test_multiple_inheritance.py",
+      "run_ask": false
+    },
+    {
+      "question": "How do lambda expressions work?",
+      "expected_file_contains": "test_lambda_expressions.py",
+      "run_ask": false
+    },
+    {
+      "question": "How do function decorators work?",
+      "expected_file_contains": "test_function_decorators.py",
+      "run_ask": false
+    },
+    {
+      "question": "How do you read a file in Python?",
+      "expected_file_contains": "test_file_reading.py",
+      "run_ask": false
+    },
+    {
+      "question": "How does the break statement work in a loop?",
+      "expected_file_contains": "test_break.py",
+      "run_ask": false
+    },
+    {
+      "question": "How do you parse JSON in Python?",
+      "expected_file_contains": "test_json.py",
+      "run_ask": false
+    },
+    {
+      "question": "How does bitwise operation work?",
+      "expected_file_contains": "test_bitwise.py",
+      "run_ask": false
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+<div class="flex min-h-screen flex-col bg-slate-50">
+  <header class="border-b border-slate-200 bg-white px-6 py-3">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="text-base font-semibold tracking-tight text-slate-800">RepoLens AI</span>
+        <span class="rounded bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500">
+          Codebase Intelligence
+        </span>
+      </div>
+      <nav class="flex flex-wrap gap-4 text-sm">
+        <a
+          routerLink="/"
+          routerLinkActive="text-slate-900 font-semibold"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="text-slate-500 hover:text-slate-800"
+          >Dashboard</a
+        >
+        <a
+          routerLink="/repositories"
+          routerLinkActive="text-slate-900 font-semibold"
+          class="text-slate-500 hover:text-slate-800"
+          >Repositories</a
+        >
+        <a
+          routerLink="/chat"
+          routerLinkActive="text-slate-900 font-semibold"
+          class="text-slate-500 hover:text-slate-800"
+          >Chat</a
+        >
+        <span class="text-slate-300">|</span>
+        <a
+          routerLink="/playground"
+          routerLinkActive="text-slate-900 font-semibold"
+          class="text-slate-500 hover:text-slate-800"
+          >LLM Playground</a
+        >
+        <a
+          routerLink="/embeddings"
+          routerLinkActive="text-slate-900 font-semibold"
+          class="text-slate-500 hover:text-slate-800"
+          >Embeddings</a
+        >
+        <a
+          routerLink="/ingest"
+          routerLinkActive="text-slate-900 font-semibold"
+          class="text-slate-500 hover:text-slate-800"
+          >Ingest (diagnostic)</a
+        >
+      </nav>
+    </div>
+  </header>
+
+  <main class="flex-1">
+    <router-outlet />
+  </main>
+</div>
